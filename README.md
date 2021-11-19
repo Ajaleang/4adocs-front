@@ -19,7 +19,7 @@ npm run build
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Instalar Bootstrap con Vue3
-''
+
 npm install bootstrap @popperjs/core
 
 Abrir main.js e importarlo: 
@@ -40,13 +40,19 @@ npm i --save @fortawesome/free-brands-svg-icons
 
 Luego en main.js se importa lo siguiente: 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
 import { library } from '@fortawesome/fontawesome-svg-core'
+
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import { fas } from '@fortawesome/free-solid-svg-icons
+
+import { fas } from '@fortawesome/free-solid-svg-icons' 
 
 library.add(fas, fab)
 
 createApp(App)
+
 .use(router)
+
 .component('fa', FontAwesomeIcon)
+
 .mount('#app')
