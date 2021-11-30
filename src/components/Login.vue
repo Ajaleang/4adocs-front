@@ -13,11 +13,11 @@
         <form v-on:submit.prevent="processLogInUser" >
                         
             <div class="form-outline mb-3">
-                    <input type="text" id="Usuario" class="form-control" placeholder="Usuario"/>                   
+                    <input type="text" v-model="user.username" id="Usuario" class="form-control" placeholder="Usuario"/>                   
             </div>
 
             <div class="form-outline mb-3">
-                    <input type="text" id="Password" class="form-control" placeholder="Contraseña"/>                   
+                    <input type="text" v-model="user.password" id="Password" class="form-control" placeholder="Contraseña"/>                   
             </div>
             
             
@@ -32,6 +32,81 @@
 </template>
 
 <script>
+import axios from "axios";
+
+export default {
+    name: 'Login',
+    
+    data: function() {
+        return {
+            user: {
+                username: "",
+                password: ""
+            },
+        };
+    },
+
+    methods: {
+        processLogInUser: function(){
+            axios.post("https://farmatic-be.herokuapp.com/login/", this.user,
+            {headers: {}}
+            )
+            .then((result) => {
+                let dataLogIn = {
+                    username: this.user.username,
+                    token_access: result.data.access,
+                    token_refresh: result.data.refresh,
+                }
+
+                this.$emit('completedLogIn', dataLogIn)
+            })
+            .catch((error) => {
+                if (error.response.status == "401")
+                    alert("ERROR 401: Credenciales Incorrectas.");
+            });
+        }
+    }    
+}
+
+
+
+/*export default {
+    name: "Login",
+
+    data: function() {
+        return {
+            user: {
+                username:"",
+                password:""
+            }
+        }
+    },
+
+    methods: {
+       processLogInUser: function() {
+           axios.post ("",
+                this.user,
+                {headers: {}}
+                )
+                .then((result) => {
+                    let dataLogin = {
+                        username: this.user.username,
+                        token_access: result.data.access,
+                        token_refresh: result.data.refresh,
+                        }
+
+                        this.$emit('completedLogIn', dataLogin)
+                    })
+                    .catch((error) => {
+                        if (error.response.status == "401")
+                            alert("ERROR 401: Credenciales Incorrectas.");
+                    });
+                }
+            }
+       } 
+    
+*/
+
 
 </script>
 

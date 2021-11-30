@@ -6,9 +6,11 @@
         <div class="menu"> 
         <nav>
             <div class="btn-group" role="group" aria-label="Basic outlined example">        
-            <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadLogIn" ><fa icon="user"/> Iniciar Sesión </button>
             <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="logOut"> Cerrar Sesión </button>
-            <button type="button" class="btn btn-link" v-on:click="loadSignUp"> Registro Usuario </button> 
+            <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadLogIn" ><fa icon="user"/> Iniciar Sesión </button>
+            <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadSignUp"> Registro Usuario </button> 
+            
+            
                      
             </div>
         </nav>
@@ -17,14 +19,23 @@
     </div> 
 
     <div class="main-component">
-      <router-view/>               
-    </div>
+        <router-view
+            v-on:completedLogIn="completedLogIn"
+            v-on:completedSignUp="completedSignUp"
+            v-on:logOut="logOut"
+        >
+        </router-view>
+        </div>
+
+    
  
 </template>
 
 <script>
+
 export default {
     name: 'App',
+
     data: function(){
     return{
         is_auth: false
@@ -35,8 +46,12 @@ export default {
 
     methods:{
         verifyAuth: function() {
+            this.is_auth = localStorage.getItem("isAuth") || false;
+
             if(this.is_auth == false)
                 this.$router.push({name: "inicio"})
+            else
+                this.$router.push({ name: "profile" });
         },
 
         loadLogIn: function(){
@@ -46,9 +61,26 @@ export default {
         loadSignUp: function(){
             this.$router.push({name: "signUp"})
         },
+        
+        logOut: function() {
+            localStorage.clear();
+            alert("Sesión Cerrada");
+            this.verifyAuth();
+        },
 
-        completedLogIn: function(data) {},
-        completedSignUp: function(data) {},
+        completedLogIn: function(data) {
+            localStorage.setItem("isAuth", true);
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("token_access", data.token_access);
+            localStorage.setItem("token_refresh", data.token_refresh);
+            alert("Autenticación Exitosa");
+            this.verifyAuth();
+        },
+
+        completedSignUp: function(data) {
+            alert("Registro Exitoso");
+            this.completedLogIn(data);
+        },
     },
     created: function(){
         this.verifyAuth()

@@ -20,7 +20,7 @@ export default {
 
   methods: {
     loadLogIn: function(){
-            this.$router.push({name: "profile"})
+            this.$router.push({name: "login"})
         },
     
   },
