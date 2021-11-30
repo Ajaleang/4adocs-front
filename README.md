@@ -64,3 +64,9 @@ createApp(App)
 .component('fa', FontAwesomeIcon)
 
 .mount('#app')
+
+### Instalación axios y jwt 
+npm install axios
+
+npm install jwt-decode
+
