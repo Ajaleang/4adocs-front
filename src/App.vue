@@ -53,6 +53,12 @@ export default {
         loadSignUp: function(){
             this.$router.push({name: "signUp"})
         },
+        
+        logOut: function() {
+            localStorage.clear();
+            alert("Sesión Cerrada");
+            this.verifyAuth();
+        },
 
         completedLogIn: function(data) {            
             localStorage.setItem("username", data.username);

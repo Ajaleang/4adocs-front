@@ -9,6 +9,7 @@ import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core
 import { createApolloProvider } from '@vue/apollo-option'
 import { setContext } from 'apollo-link-context'
 
+
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 

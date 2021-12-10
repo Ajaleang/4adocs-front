@@ -77,6 +77,31 @@ const routes = [
     meta: { 
       requiresAuth: false }
   },
+  {
+    path: '/producto',
+    name: 'producto',
+    component: Productos
+  },
+  {
+    path: '/inventario',
+    name: 'inventario',
+    component: Inventario
+  },
+  {
+    path: '/proveedores',
+    name: 'proveedores',
+    component: Proveedores
+  },
+  {
+    path: '/pedidos',
+    name: 'pedidos',
+    component: Pedidos
+  },
+  {
+    path: '/listaproveedores',
+    name: 'listaprov',
+    component: ListaProveedores
+  },
    
   
 ]
