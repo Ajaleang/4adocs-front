@@ -4,30 +4,30 @@
     </div>
     
     <div class="welcome" >       
-    <h1> ¡Bienvenido <span> {{ username }} </span>! </h1>
+        <h1> Bienvenido <span> {{  }} </span> </h1>
     </div>
 
     <div class="bloque">
         <div class="blq_items">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" v-on:click="producto">
                 <img alt="Logoapp" src="../assets/pills.png" class="img-fluid" width="100" height="100">
                 <h3>Productos</h3>
             </button>
         </div>
         <div class="blq_items">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" v-on:click="inventario">
                 <img alt="Logoapp" src="../assets/inventario.png" class="img-fluid" width="100" height="100">
                 <h3>Inventario</h3>
             </button>
         </div>
         <div class="blq_items">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" v-on:click="proveedores">
                 <img alt="Logoapp" src="../assets/proveedores.png" class="img-fluid" width="100" height="100">
                 <h3>Proveedores</h3>
             </button>
         </div>
          <div class="blq_items">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" v-on:click="pedidos">
                 <img alt="Logoapp" src="../assets/pedido.png" class="img-fluid" width="100" height="100">
                 <h3>Pedidos</h3>
             </button>
@@ -37,14 +37,53 @@
 </template>
 
 <script>
+
+import gql from "graphql-tag";
+import jwt_decode from "jwt-decode";
+
 export default {
     name: "profile",
     
     data: function() {
         return {
-            username: localStorage.getItem("username") || "usuario",
+            id              : jwt_decode(localStorage.getItem("token_refresh")).user_id,
+            userDetailById  : {
+                username    : "",                
+            }
         }
-    }
+    },
+
+    apollo: {
+        userDetailById: {
+            query: gql  
+                `query ($id: Int!) {
+                    userDetailById(id: $id) {
+                        username                       
+                    }
+                }
+            `,
+            variables() {
+                return {
+                    id: this.id,
+                };
+            },
+        }
+    },
+
+    methods: {
+        producto: function() {
+            this.$router.push({name: "producto"})
+        },
+        inventario: function() {
+            this.$router.push({name: "inventario"})
+        },
+        proveedores: function() {
+            this.$router.push({name: "proveedores"})
+        },
+        pedidos: function() {
+            this.$router.push({name: "pedidos"})
+        },
+    },
 
 };
 
@@ -74,6 +113,7 @@ export default {
 span {
     color: #fc10e6;
     position:relative;
+    font-style: italic;
 }
 
 .bloque {
@@ -106,16 +146,6 @@ span {
     justify-content: center;
     align-items: center;
     margin-top: 15px;
-}
-
-.fa {
-    height: 3000px;
-    width: 3000px;
-    color: #fff;
-    align-items: center;
-    justify-content: center;
-    margin-top: 15px;   
-    position:relative; 
 }
 
 .blq_items button:hover{

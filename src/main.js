@@ -5,13 +5,39 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import App from './App.vue'
 import router from './router'
+import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
+import { createApolloProvider } from '@vue/apollo-option'
+import { setContext } from 'apollo-link-context'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 
-library.add(fas, fab)
 
+const httpLink = createHttpLink({
+    uri: 'https://mision-tic-api-gateway.herokuapp.com/',
+})
+
+const authLink = setContext((_, { headers }) => {
+    return {
+        headers: {
+            ...headers,
+            "Authorization": localStorage.getItem("token_access") || ""
+        }
+    }
+})
+
+const apolloClient = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache()
+})
+
+const apolloProvider = new createApolloProvider({
+    defaultClient: apolloClient
+})
+
+library.add(fas, fab)
 createApp(App)
 .use(router)
+.use(apolloProvider)
 .component('fa', FontAwesomeIcon)
 .mount('#app')

@@ -13,11 +13,11 @@
         <form v-on:submit.prevent="processLogInUser" >
                         
             <div class="form-outline mb-3">
-                    <input type="text" id="Usuario" class="form-control" placeholder="Usuario"/>                   
+                    <input type="text" v-model="user.username" id="Usuario" class="form-control" placeholder="Usuario"/>                   
             </div>
 
             <div class="form-outline mb-3">
-                    <input type="text" id="Password" class="form-control" placeholder="Contraseña"/>                   
+                    <input type="text" v-model="user.password" id="Password" class="form-control" placeholder="Contraseña"/>                   
             </div>
             
             
@@ -32,6 +32,51 @@
 </template>
 
 <script>
+import gql from "graphql-tag";
+
+export default {
+    name: 'Login',
+    
+    data: function() {
+        return {
+            user: {
+                username: "",
+                password: ""
+            },
+        };
+    },
+
+    methods: {
+        processLogInUser: async function() {
+            await this.$apollo
+               .mutate({
+                    mutation: gql
+                        `mutation($credentials: CredentialsInput!) {
+                            logIn(credentials: $credentials) {
+                                refresh
+                                access
+                            }
+                        } `, 
+                        
+                    variables: {
+                        credentials: this.user,
+                    },
+                })            
+                .then((result) => {
+                    let dataLogIn = {
+                        username        : this.user.username,
+                        token_access    : result.data.logIn.access,
+                        token_refresh   : result.data.logIn.refresh,
+                    }
+                    this.$emit('completedLogin', dataLogIn)
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("ERROR 401: Credenciales Incorrectas.");
+                });
+        }
+    }
+}
 
 </script>
 

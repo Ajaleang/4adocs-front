@@ -10,32 +10,37 @@
     
         <form v-on:submit.prevent="processSignUp" >
             <div class="form-outline mb-3">
-                    <input type="text" id="NombreCompleto" class="form-control" placeholder="Nombre Completo"/>                   
+                    <input type="text" v-model="user.name" id="NombreCompleto" class="form-control" placeholder="Nombre Completo"/>                   
             </div>
            
-            <select class="form-select mb-3" aria-label="Default select example"> 
-                <option selected>Tipo de Documento</option>
+            <!-- <div>
+            <select v-model="user.tipo_documento" class="form-select mb-3" aria-label="Default select example" placeholder="Tipo de Documento"> 
                 <option value="CC">CC</option>
                 <option value="CE">CE</option>                    
-            </select>
+            </select> 
+            </div> -->
+
+           <div class="form-outline mb-3">
+                <input type="text" v-model="user.tipo_documento" id="NdeDocumento" class="form-control" placeholder="Tipo de Documento" />                 
+            </div> 
             
             <div class="form-outline mb-3">
-                <input type="text" id="NdeDocumento" class="form-control" placeholder="N° de Documento" />                 
+                <input type="text" v-model="user.document" id="NdeDocumento" class="form-control" placeholder="N° de Documento" />                 
             </div>              
                 
             <div class="form-outline mb-3">
-                <input type="text" id="Email" class="form-control" placeholder="Correo"/>                   
+                <input type="text" v-model="user.email" id="Email" class="form-control" placeholder="Correo"/>                   
             </div>
 
             <div class="row mb-3">
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" id="Usuario" class="form-control" placeholder="Usuario"/>
+                        <input type="text" v-model="user.username" id="Usuario" class="form-control" placeholder="Usuario"/>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" id="Contraseña" class="form-control" placeholder="Contraseña" />                            
+                        <input type="text" v-model="user.password" id="Contraseña" class="form-control" placeholder="Contraseña" />                            
                     </div>
                 </div>
             </div>
@@ -44,15 +49,61 @@
            
         </form>
     </div>
-</div>  
-   
-   
+</div>   
    
 
 </template>
 
+<script>
+import gql from "graphql-tag";
 
+export default {
+    name: "SignUp",
+    
+    data: function(){
+        return {
+            user: {
+                name           : "",
+                tipo_documento : "",
+                document       : "",                          
+                email          : "",
+                username       : "",
+                password       : "",               
+            }
+        }
+    },
 
+    methods: {
+        processSignUp: async function() {
+            await this.$apollo
+               .mutate({
+                    mutation: gql
+                        `mutation SignUpUser($userInput: SignUpInput!) {
+                            signUpUser(userInput: $userInput) {
+                                refresh
+                                access
+                            }
+                        }
+                    `, 
+                    variables: {
+                        userInput: this.user,
+                    },
+                })            
+                .then((result) => {
+                    let dataSignUp = {
+                        username: this.user.username,
+                        token_access: result.data.signUpUser.access,
+                        token_refresh: result.data.signUpUser.refresh,
+                    };
+                    this.$emit('completedSignUp', dataSignUp)
+                })
+                .catch((error) => {
+                    alert("ERROR: Fallo en el registro.");
+                });
+        }
+    }
+}
+</script>
 
 
 <style>

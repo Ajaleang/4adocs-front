@@ -4,7 +4,7 @@
         <img alt="Logoapp" src="../assets/logofarmatic.png" class="img-fluid" width="420" height="420">
         
         <div class="btn-group" role="group" aria-label="Basic outlined example">
-            <button type="button" class="btn btn-primary" v-on:click="loadLogIn" >Comenzar </button>
+            <button type="button" class="btn btn-primary" v-on:click="loadLogIn" > Comenzar </button>
         </div>       
     
     </div>

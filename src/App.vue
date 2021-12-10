@@ -5,11 +5,12 @@
 
         <div class="menu"> 
         <nav>
-            <div class="btn-group" role="group" aria-label="Basic outlined example">        
-            <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadLogIn" ><fa icon="user"/> Iniciar Sesión </button>
-            <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="logOut"> Cerrar Sesión </button>
-            <button type="button" class="btn btn-link" v-on:click="loadSignUp"> Registro Usuario </button> 
-                     
+            <div class="btn-group" role="group" aria-label="Basic outlined example">    
+                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="loadProfile"> Inicio Admin </button>        
+                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="logOut"> Cerrar Sesión </button>
+               
+                <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadLogIn" ><fa icon="user"/> Iniciar Sesión </button>
+                <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadSignUp"> Registro Usuario </button> 
             </div>
         </nav>
         </div> 
@@ -17,28 +18,34 @@
     </div> 
 
     <div class="main-component">
-      <router-view/>               
-    </div>
+        <router-view
+            v-on:completedLogIn="completedLogIn"
+            v-on:completedSignUp="completedSignUp"
+            v-on:logOut="logOut"
+        >
+        </router-view>
+        </div>
+
+    
  
 </template>
 
 <script>
+
 export default {
     name: 'App',
-    data: function(){
-    return{
-        is_auth: false
-    }
-},
-    components: {
+
+    computed: {
+       isAuth: {
+            get: function() {
+                return this.$router.meta.requiresAuth;
+            },
+            set: function() { }
+        }
     },
 
     methods:{
-        verifyAuth: function() {
-            if(this.is_auth == false)
-                this.$router.push({name: "inicio"})
-        },
-
+        
         loadLogIn: function(){
             this.$router.push({name: "login"})
         },
@@ -47,17 +54,32 @@ export default {
             this.$router.push({name: "signUp"})
         },
 
-        completedLogIn: function(data) {},
-        completedSignUp: function(data) {},
+        completedLogIn: function(data) {            
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("token_access", data.token_access);
+            localStorage.setItem("token_refresh", data.token_refresh);
+            alert("Autenticación Exitosa");
+            this.loadProfile();
+        },
+
+        completedSignUp: function(data) {
+            alert("Registro Exitoso");
+            this.completedLogIn(data);
+        },
+
+        loadProfile: function() {
+            this.$router.push({ name: "profile" });
+        },
+        
+        logOut: function() {
+            localStorage.clear();
+            alert("Sesión Cerrada");
+            this.loadLogIn();
+        },   
+        
     },
-    created: function(){
-        this.verifyAuth()
-    }
 }
 </script>
-
-
-
 
 <style>
 #fondo {
