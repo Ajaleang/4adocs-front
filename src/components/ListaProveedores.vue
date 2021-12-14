@@ -7,7 +7,15 @@
          <h1> Lista Proveedores </h1>
     </div>
    
-    
+    <div class="input-group" >
+        <div class="form-outline" >
+            <input type="search" id="form1" class="form-control" placeholder="Buscar" />            
+        </div>
+        <button type="button" class="btn btn-primary">
+            <fa icon="search"/>
+        </button>
+    </div>
+
     <div class="bloque_listaprov">
         <div class="blq_items_listaprov" >
             <button type="button" class="btn btn-primary" v-on:click="producto">                
@@ -35,8 +43,7 @@
     <div class="table_prov">
     <table class="table"> 
         <thead>
-            <tr>
-                <th>Id</th>
+            <tr>                
                 <th>Laboratorio</th>
                 <th>Contacto</th>
                 <th>Email</th>
@@ -44,12 +51,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th>001</th>
-                <td>Genfar</td>
-                <td>Claudia Serrano</td>
-                <td>claudias@gmail.com</td>
-                <td>3114567894</td>                         
+            <tr v-for="lab in ProveedorListByLaboratorio" :key="lab.id">                
+                <td>{{ lab.laboratorio }} </td>
+                <td>{{ lab.nombreDeContacto }} </td>
+                <td>{{ lab.email }}</td>
+                <td>{{ lab.telefono }}</td>                         
             </tr>
         </tbody>
     </table>
@@ -60,9 +66,43 @@
 </template>
 
 <script>
+
+import gql        from 'graphql-tag';
+
 export default {
     name: "listaprov",    
-       
+    
+    data: function () {
+        return {
+            ProveedorListByLaboratorio: [],
+        };
+    },
+    
+    apollo: {
+       ProveedorListByLaboratorio: {
+            query: gql
+                `query ProveedorListByLaboratorio($laboratorio: String!) {
+                    proveedorListByLaboratorio(laboratorio: $laboratorio) {
+                        laboratorio
+                        nombreDeContacto
+                        email
+                        telefono
+                    }
+                }
+            `, 
+        variables() {
+            return {
+                laboratorio: this.ProveedorListByLaboratorio, 
+            };
+        }
+
+        }
+    },
+   
+    created: function() {
+        this.$apollo.queries.ProveedorListByLaboratorio.refetch();
+        
+    },
 
     methods: {
         producto: function() {
@@ -92,6 +132,12 @@ export default {
     display: inline-block;
 }
 
+.input-group {
+    margin-left: 435px;
+    margin-top: 30px;
+    
+}
+
 .listaprov {
     color: #136fb5;
     text-align: center;
@@ -110,7 +156,7 @@ export default {
 .bloque_listaprov {    
     margin-left: 1000px;
     position:absolute;
-    margin-top: -10px;    
+    margin-top: -50px;    
 }
 
 .blq_items_listaprov button {
@@ -148,7 +194,7 @@ export default {
 
 .table_prov {      
     margin-top: 50px;
-    margin-left: 130px; 
+    margin-left: 300px; 
     white-space:nowrap;     
     display: inline-block; 
     position: relative;

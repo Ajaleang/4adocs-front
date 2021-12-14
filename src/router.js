@@ -21,6 +21,7 @@ const routes = [
     meta: { 
       requiresAuth: false }
   },
+    
   {
     path: '/user/login',
     name: 'login',
@@ -40,67 +41,42 @@ const routes = [
     name: 'profile',
     component: Profile,
     meta: { 
-      requiresAuth: false }
+      requiresAuth: true }
   },
   {
     path: '/producto',
     name: 'producto',
     component: Productos,
     meta: { 
-      requiresAuth: false }
+      requiresAuth: true }
   },
   {
     path: '/inventario',
     name: 'inventario',
     component: Inventario,
     meta: { 
-      requiresAuth: false}
+      requiresAuth: true }
   },
   {
     path: '/proveedores',
     name: 'proveedores',
     component: Proveedores,
     meta: { 
-      requiresAuth: false }
+      requiresAuth: true }
   },
   {
     path: '/pedidos',
     name: 'pedidos',
     component: Pedidos,
     meta: { 
-      requiresAuth: false }
+      requiresAuth: true }
   },
   {
     path: '/listaproveedores',
     name: 'listaprov',
     component: ListaProveedores,
     meta: { 
-      requiresAuth: false }
-  },
-  {
-    path: '/producto',
-    name: 'producto',
-    component: Productos
-  },
-  {
-    path: '/inventario',
-    name: 'inventario',
-    component: Inventario
-  },
-  {
-    path: '/proveedores',
-    name: 'proveedores',
-    component: Proveedores
-  },
-  {
-    path: '/pedidos',
-    name: 'pedidos',
-    component: Pedidos
-  },
-  {
-    path: '/listaproveedores',
-    name: 'listaprov',
-    component: ListaProveedores
+      requiresAuth: true }
   },
    
   
@@ -112,44 +88,55 @@ const router = createRouter({
 })
 
 const apolloClient = new ApolloClient({
-  link: createHttpLink({ uri: 'https://mision-tic-api-gateway.herokuapp.com/' }),
+  link: createHttpLink({ uri: 'http://localhost:4000/farmatic' }),
   cache: new InMemoryCache()
 })
 
 async function isAuth() {
-  if (localStorage.getItem("token_access") === null ||
-localStorage.getItem("token_refresh") === null) {
+  if (localStorage.getItem("token_refresh") === null || localStorage.getItem("token_access") === null) {
     return false;
   }
 
   try {
       var result = await apolloClient.mutate({
-        mutation: gql `
-          mutation ($refresh: String!) {
+        mutation: gql       
+        `
+          mutation RefreshToken($refresh: String!) {
             refreshToken(refresh: $refresh) {
               access
-            }
-        }
-      `,
+              }
+        }        
+        `,
         variables: {
           refresh: localStorage.getItem("token_refresh"),
         },
       })
 
       localStorage.setItem("token_access", result.data.refreshToken.access);
-      return true;
-}   catch {
-      localStorage.clear();
-      alert("Su sesión expiró, por favor vuelva a iniciar sesión");
-      return false;
-    }   
-}
+        return true;
+      }   
+  catch(error) {
+        localStorage.clear();
+        alert("Su sesión expiró, por favor vuelva a iniciar sesión");
+        return false;
+      }   
+  }
 
 router.beforeEach(async(to, from) => {
+  /*console.log(`Routing ${from.name} to ${to.name}...`);
+  let is_auth = await isAuth();*/
   var is_auth = await isAuth();
-  if (is_auth == to.meta.requiresAuth) return true
-  if (is_auth) return { name: "home" };
-  return { name: "logIn" };
-})
 
-export default router
+  
+  if (is_auth == to.meta.requiresAuth) 
+    return true;
+
+  if (is_auth) {
+    return { name: "profile" };
+  }
+  else {
+    return { name: "inicio" };
+  }
+});
+
+export default router;

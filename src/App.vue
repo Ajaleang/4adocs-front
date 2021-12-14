@@ -6,9 +6,10 @@
         <div class="menu"> 
         <nav>
             <div class="btn-group" role="group" aria-label="Basic outlined example">    
-                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="loadProfile"> Inicio Admin </button>        
-                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="logOut"> Cerrar Sesión </button>
+                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="loadProfile"> Inicio Admin </button>      
+                <button type="button" class="btn btn-link" v-if="is_auth" v-on:click="logOut"> Cerrar Sesión </button>                 
                
+                <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadInicio"><fa icon="home"/> Principal </button> 
                 <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadLogIn" ><fa icon="user"/> Iniciar Sesión </button>
                 <button type="button" class="btn btn-link" v-if="!is_auth" v-on:click="loadSignUp"> Registro Usuario </button> 
             </div>
@@ -36,9 +37,9 @@ export default {
     name: 'App',
 
     computed: {
-       isAuth: {
+       is_auth: {
             get: function() {
-                return this.$router.meta.requiresAuth;
+                return this.$route.meta.requiresAuth;
             },
             set: function() { }
         }
@@ -53,17 +54,11 @@ export default {
         loadSignUp: function(){
             this.$router.push({name: "signUp"})
         },
-        
-        logOut: function() {
-            localStorage.clear();
-            alert("Sesión Cerrada");
-            this.verifyAuth();
-        },
 
         completedLogIn: function(data) {            
             localStorage.setItem("username", data.username);
-            localStorage.setItem("token_access", data.token_access);
             localStorage.setItem("token_refresh", data.token_refresh);
+            localStorage.setItem("token_access", data.token_access);            
             alert("Autenticación Exitosa");
             this.loadProfile();
         },
@@ -76,6 +71,10 @@ export default {
         loadProfile: function() {
             this.$router.push({ name: "profile" });
         },
+
+        loadInicio: function() {
+            this.$router.push({ name: "inicio" });
+        },
         
         logOut: function() {
             localStorage.clear();
@@ -84,6 +83,8 @@ export default {
         },   
         
     },
+
+   
 }
 </script>
 
@@ -108,11 +109,11 @@ export default {
     font-size: 20px;
     border: none;
     padding: 10px 20px;
-    width:190px;
+    width:186px;
     height:50px;
     box-shadow: none;
     text-decoration: none;  
-    margin-left: 980px; 
+    margin-left: 780px; 
     margin-top: 15px;
   
 }

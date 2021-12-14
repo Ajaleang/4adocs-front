@@ -16,19 +16,13 @@
                 </div>
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" v-model="products.laboratorio" id="codigo" class="form-control" placeholder="Laboratorio" />                            
+                        <input type="text" v-model="products.laboratorio" id="laboratorio" class="form-control" placeholder="Laboratorio" />                            
                     </div>
-                </div>
-                <!--<div class="col">
-                    <select class="form-select" aria-label="Default select example"> 
-                        <option selected>Proveedor</option>
-                        <option value=""> </option>                                           
-                    </select>
-                </div>-->
+                </div>              
             </div>                  
             
             <div class="form-outline mb-3">
-                <input type="text" v-model="products.medicamento" id="medicamento" class="form-control" placeholder="Nombre del Medicamento" />                 
+                <input type="text" v-model="products.nombreMedicamento" id="medicamento" class="form-control" placeholder="Nombre del Medicamento" />                 
             </div>              
                 
             <div class="form-outline mb-3">
@@ -42,7 +36,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <input type="text" v-model="products.cantidad" id="cantidad" class="form-control" placeholder="Cantidad"/>
+                    <input type="number" v-model="products.cantidad" id="cantidad" class="form-control" placeholder="Cantidad"/>
                 </div>
             </div>       
           
@@ -50,20 +44,18 @@
             <div class="row mb-3">            
                 
                 <div class="col">                    
-                    <p>Fecha Fab.</p>                              
+                    <p>Fecha Ven.</p>                              
                 </div>
                 <div class="col">                    
-                    <input  type="date"  id="start" name="trip-start"
-                            value="2021-12-09"
+                    <input  v-model="products.fechaVencimiento" type="date"  id="start" name="trip-start"
                             min="2000-12-01" max="2030-12-31" 
                             >              
                 </div>
                 <div class="col">                     
-                    <p>Fecha Ven.</p>                              
+                    <p>Fecha Fab.</p>                              
                 </div>
                 <div class="col">                    
-                    <input  type="date"  id="start" name="trip-start"
-                            value="2021-12-09"
+                    <input  v-model="products.fechaFabricacion" type="date"  id="start" name="trip-start"
                             min="2000-12-01" max="2030-12-31"
                             >                               
                 </div>                
@@ -72,20 +64,20 @@
             <div class="row mb-3">
                 <div class="col">
                     <div class="form-outline ">
-                        <input type="text" v-model="products.precioCosto" id="costo" class="form-control" placeholder="Precio Costo"/>
+                        <input type="number" v-model="products.precioCosto" id="costo" class="form-control" placeholder="Precio Costo"/>
                     </div>
                 </div>
                 <div class="col" >
                     <div class="form-outline ">
-                        <input type="text" v-model="products.precioVenta" id="venta" class="form-control" placeholder="Precio Venta" />                            
+                        <input type="number" v-model="products.precioVenta" id="venta" class="form-control" placeholder="Precio Venta" />                            
                     </div>
                 </div>
             </div>
             
-            <button type="submit" @click="createProducts"><h4>Agregar</h4></button>  
-            <button type="submit" @click="updateProducts"><h4>Actualizar</h4></button>
-            <button type="submit" @click="buscarProducts"><h4>Buscar</h4></button>             
-            <button type="submit" @click="deleteProducts"><h4>Eliminar</h4></button>                  
+            <button type="submit"><h4>Agregar</h4></button>  
+            <button ><h4>Actualizar</h4></button>
+            <button ><h4>Buscar</h4></button>             
+            <button ><h4>Eliminar</h4></button>                  
            
         </form>
         </div>
@@ -129,8 +121,8 @@ export default {
 
     data: function() {
         return {
-            products: {
-                id: null,
+           products: {
+                id: "",
                 laboratorio: "",
                 nombreMedicamento: "",
                 concentracion: "",
@@ -146,11 +138,42 @@ export default {
 
     methods: {
         createProducts: async function() {
+
+            if (localStorage.getItem("token_access") === null || localStorage.getItem("token_refresh") === null ) {
+                this.$emit("logOut");
+                return;
+            }
+
+            localStorage.setItem("token_access", "");
+
+            await this.$apollo
+                .mutate ({
+                    mutation: gql
+                         `mutation ($refresh: String!) {
+                            refreshToken(refresh: $refresh) {
+                                access
+                            }
+                        }
+                    `, 
+                variables: {
+                    refresh: localStorage.getItem("token_refresh"),
+                    },
+                })        
+            
+                .then((result) => {
+                    localStorage.setItem("token_access", result.data.refreshToken.access);
+                })
+            
+                .catch((error) => {
+                    this.$emit("logOut");
+                    return;
+                });
+
             await this.$apollo
                .mutate({
                     mutation: gql
-                         `mutation($producto: Product!) {
-                            createProduct(producto: Product!) {
+                         `mutation Mutation($producto: ProductInput!) {
+                            createProduct(producto: $producto) {
                                 id
                                 laboratorio
                                 nombreMedicamento
@@ -167,58 +190,18 @@ export default {
                     variables: {
                         producto: this.products,
                     },
-                })   
+                })
+                
+                .then((result) => {
+                    alert ("Producto Ingresado Exitosamente");
+                
+                })
+                .catch((error) => {
+                    alert("ERROR al ingresar el Producto");
+                });
         },
 
-        updateProducts: async function() {
-            await this.$apollo
-               .mutate({
-                    mutation: gql
-                         `mutation($producto: Product!) {
-                            updateProduct(producto: ProductUpdate!) {
-                                id
-                                laboratorio
-                                nombreMedicamento
-                                concentracion
-                                presentacion
-                                cantidad
-                                fechaVencimiento
-                                fechaFabricacion
-                                precioCosto
-                                precioVenta
-                            }
-                        }
-                    `, 
-                    variables: {
-                        producto: this.products,
-                    },
-                })   
-        },
-
-        deleteProducts: async function() {
-            await this.$apollo
-               .mutate({
-                    mutation: gql
-                         `mutation($producto: Product!) {
-                            deleteProduct(laboratorio:String!) {
-                                id
-                                laboratorio
-                                nombreMedicamento
-                                concentracion
-                                presentacion
-                                cantidad
-                                fechaVencimiento
-                                fechaFabricacion
-                                precioCosto
-                                precioVenta
-                            }
-                        }
-                    `, 
-                    variables: {
-                        producto: this.products,
-                    },
-                })   
-        },
+        
 
         producto: function() {
             this.$router.push({name: "producto"})

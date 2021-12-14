@@ -17,7 +17,7 @@
             </div>
 
             <div class="form-outline mb-3">
-                    <input type="text" v-model="user.password" id="Password" class="form-control" placeholder="Contraseña"/>                   
+                    <input type="password" v-model="user.password" id="Password" class="form-control" placeholder="Contraseña"/>                   
             </div>
             
             
@@ -51,7 +51,7 @@ export default {
             await this.$apollo
                .mutate({
                     mutation: gql
-                        `mutation($credentials: CredentialsInput!) {
+                        `mutation LogIn($credentials: CredentialsInput!) {
                             logIn(credentials: $credentials) {
                                 refresh
                                 access
@@ -68,7 +68,7 @@ export default {
                         token_access    : result.data.logIn.access,
                         token_refresh   : result.data.logIn.refresh,
                     }
-                    this.$emit('completedLogin', dataLogIn)
+                    this.$emit('completedLogIn', dataLogIn)
                 })
                 .catch((error) => {
                     console.log(error);

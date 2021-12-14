@@ -7,7 +7,15 @@
          <h1> Inventario </h1>
     </div>
    
-    
+    <div class="input-group" >
+        <div class="form-outline" >
+            <input type="search" id="form1" class="form-control" placeholder="Buscar" />            
+        </div>
+        <button type="button" class="btn btn-primary">
+            <fa icon="search"/>
+        </button>
+    </div>
+
     <div class="bloque_inventario">
         <div class="blq_items_inv" >
             <button type="button" class="btn btn-primary" v-on:click="producto">                
@@ -37,19 +45,20 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Laboratorio</th>
                 <th>Producto</th>
                 <th>Concentración</th>
-                <th>Cantidad</th>
-                <th>Proveedor</th>                
+                <th>Cantidad</th>                                
             </tr>
         </thead>
         <tbody>
-            <tr v-for="inventario in inventarioByMedicamento" :key="inventario.id">
-                <th> {{ inventario.id }} </th>
+            <tr v-for="inventario in  inventarioByMedicamento" :key="inventario.nombreMedicamento">
+                <td> {{ inventario.id }} </td>
+                <td> {{ inventario.laboratorio }} </td> 
                 <td> {{ inventario.nombreMedicamento }} </td>
                 <td> {{ inventario.concentracion }} </td>
                 <td> {{ inventario.cantidad }} </td>
-                <td> {{ inventario.laboratorio }} </td>                                         
+                                                        
             </tr>
         </tbody>
     </table>
@@ -60,10 +69,51 @@
 </template>
 
 <script>
-export default {
-    name: "listaprov",    
-       
+import gql        from 'graphql-tag';
 
+export default {
+    name: "inventario",    
+   
+    data: function() {
+            return {
+                inventarioByMedicamento: {
+                    id:"",
+                    laboratorio: "",
+                    nombreMedicamento: "",
+                    concentracion:"",                    
+                    cantidad: "",
+                    
+            },
+        };
+    },
+
+
+    apollo: {
+        inventarioByMedicamento: {
+            query: gql
+                `query Query($nombreMedicamento: String!) {
+                    inventarioByMedicamento(nombreMedicamento: $nombreMedicamento){
+                        id
+                        laboratorio
+                        nombreMedicamento
+                        concentracion
+                        cantidad
+                    }
+                }
+            `, 
+        variables() {
+            return {
+                nombreMedicamento: this.inventarioByMedicamento, 
+            };
+        }
+
+        }
+    },
+
+    created: function() {
+        this.$apollo.queries.inventarioByMedicamento.refetch();
+    },
+    
     methods: {
         producto: function() {
             this.$router.push({name: "producto"})
@@ -92,6 +142,12 @@ export default {
     display: inline-block;
 }
 
+.input-group {
+    margin-left: 435px;
+    margin-top: 30px;
+    
+}
+
 .inventario {
     color: #136fb5;
     text-align: center;
@@ -110,7 +166,7 @@ export default {
 .bloque_inventario {    
     margin-left: 1000px;
     position:absolute;
-    margin-top: -10px;    
+    margin-top: -70px;    
 }
 
 .blq_items_inv button {
@@ -140,7 +196,7 @@ export default {
     margin-top:-2px;
 }
 
-.blq_items_inv button:hover{
+.blq_items_inv button:hover {
     color: #E5E7E9;
     background: #fc10e6;
     border: 1px solid #136fb5;
@@ -165,10 +221,11 @@ export default {
   } 
 
 .table_inv th {
-    color: #136fb5;
-
-    
+    color: #136fb5;    
   }
 
+.table_inv td {
+    color: #000000;    
+  }
 
 </style>

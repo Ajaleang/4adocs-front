@@ -10,37 +10,31 @@
     
         <form v-on:submit.prevent="processSignUp" >
             <div class="form-outline mb-3">
-                    <input type="text" v-model="user.name" id="NombreCompleto" class="form-control" placeholder="Nombre Completo"/>                   
+                    <input type="text" v-model="user.name" id="NombreCompleto" class="form-control" placeholder="Nombre Completo" required>                   
             </div>
            
-            <!-- <div>
-            <select v-model="user.tipo_documento" class="form-select mb-3" aria-label="Default select example" placeholder="Tipo de Documento"> 
-                <option value="CC">CC</option>
-                <option value="CE">CE</option>                    
-            </select> 
-            </div> -->
-
-           <div class="form-outline mb-3">
-                <input type="text" v-model="user.tipo_documento" id="NdeDocumento" class="form-control" placeholder="Tipo de Documento" />                 
+            <div class="form-outline mb-3">
+                <input type="text" v-model="user.tipo_documento" id="tipodeDocumento" class="form-control" placeholder="Tipo de Documento" required>                 
             </div> 
             
             <div class="form-outline mb-3">
-                <input type="text" v-model="user.document" id="NdeDocumento" class="form-control" placeholder="N° de Documento" />                 
+                <input type="number" v-model="user.document" id="NdeDocumento" class="form-control" placeholder="N° de Documento" required>                 
             </div>              
                 
             <div class="form-outline mb-3">
-                <input type="text" v-model="user.email" id="Email" class="form-control" placeholder="Correo"/>                   
+                <input type="text" v-model="user.email" id="Email" class="form-control" placeholder="Correo" required>                   
             </div>
 
             <div class="row mb-3">
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" v-model="user.username" id="Usuario" class="form-control" placeholder="Usuario"/>
+                        <input type="text" v-model="user.username" id="Usuario" class="form-control" placeholder="Usuario" required>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" v-model="user.password" id="Contraseña" class="form-control" placeholder="Contraseña" />                            
+                        <input type="password" v-model="user.password" id="Contraseña" class="form-control" placeholder="Contraseña" required>                            
+                    
                     </div>
                 </div>
             </div>
@@ -78,7 +72,7 @@ export default {
             await this.$apollo
                .mutate({
                     mutation: gql
-                        `mutation SignUpUser($userInput: SignUpInput!) {
+                        `mutation SignUpUser($userInput: SignUpInput) {
                             signUpUser(userInput: $userInput) {
                                 refresh
                                 access

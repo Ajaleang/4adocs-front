@@ -7,45 +7,41 @@
                    
     <div class="container_proveedor_form">        
             
-        <form >
-
+        <form v-on:submit.prevent="createProveedor">
+                   
             <div class="form-outline mb-3">
-                <input type="text" id="id" class="form-control" placeholder="ID Proveedor" />                 
-            </div> 
-         
-            <div class="form-outline mb-3">
-                <input type="text" id="laboratorio" class="form-control" placeholder="Laboratorio" />                 
+                <input type="text" v-model="prov.laboratorio" id="laboratorio" class="form-control" placeholder="Laboratorio" />                 
             </div>              
                 
             <div class="form-outline mb-3">
-                <input type="text" id="contacto" class="form-control" placeholder="Nombre de Contacto"/>                   
+                <input type="text" v-model="prov.nombreDeContacto" id="contacto" class="form-control" placeholder="Nombre de Contacto"/>                   
             </div>
     
             <div class="form-outline mb-3">
-                <input type="text" id="email" class="form-control" placeholder="Email"/>                   
+                <input type="text" v-model="prov.email" id="email" class="form-control" placeholder="Email"/>                   
             </div>
 
             <div class="form-outline mb-3">
-                <input type="text" id="direccion" class="form-control" placeholder="Dirección"/>                   
+                <input type="text" v-model="prov.direccion" id="direccion" class="form-control" placeholder="Dirección"/>                   
             </div>
 
             <div class="row mb-3">                
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" id="telefono" class="form-control" placeholder="Teléfono" />                            
+                        <input type="number" v-model="prov.telefono" id="telefono" class="form-control" placeholder="Teléfono" />                            
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" id="celular" class="form-control" placeholder="Celular" />                            
+                        <input type="number" v-model="prov.celular" id="celular" class="form-control" placeholder="Celular" />                            
                     </div>
                 </div>
             </div>           
 
-            <button type="submit "><h4>Agregar</h4></button>  
-            <button type="submit "><h4>Buscar</h4></button> 
-            <button type="submit "><h4>Modificar</h4></button>
-            <button type="submit "><h4>Eliminar</h4></button>                  
+            <button type="submit" ><h4>Agregar</h4></button>  
+            <button><h4>Buscar</h4></button> 
+            <button><h4>Actualizar</h4></button>
+            <button><h4>Eliminar</h4></button>                  
            
         </form>  
 
@@ -88,11 +84,86 @@
 </template>
 
 <script>
+import gql from "graphql-tag";
+
 export default {
     name: "proveedores",    
-       
+
+    data: function() {
+        return {            
+            prov: {
+                laboratorio: "",
+                nombreDeContacto: "",
+                email: "",
+                direccion: "",
+                telefono: "",
+                celular: "",                
+            },
+        };
+    },
 
     methods: {
+        createProveedor: async function() {
+
+            if (localStorage.getItem("token_access") === null || localStorage.getItem("token_refresh") === null ) {
+                this.$emit("logOut");
+                return;
+            }
+
+            localStorage.setItem("token_access", "");
+
+            await this.$apollo
+                .mutate ({
+                    mutation: gql
+                         `mutation ($refresh: String!) {
+                            refreshToken(refresh: $refresh) {
+                                access
+                            }
+                        }
+                    `, 
+                variables: {
+                    refresh: localStorage.getItem("token_refresh"),
+                    },
+                })        
+            
+                .then((result) => {
+                    localStorage.setItem("token_access", result.data.refreshToken.access);
+                })
+            
+                .catch((error) => {
+                    this.$emit("logOut");
+                    return;
+                });
+                        
+            
+            await this.$apollo
+               .mutate({
+                    mutation: gql
+                         `mutation Mutation($proveedor: ProveedorInput!) {
+                            createProveedor(proveedor: $proveedor) {
+                                laboratorio
+                                nombreDeContacto
+                                email
+                                direccion
+                                telefono
+                                celular                                
+                            }
+                        }                        
+                    `, 
+                    variables: {
+                        proveedor: this.prov,
+                    },
+                })   
+        
+                .then((result) => {
+                    alert ("Proveedor Ingresado Exitosamente");
+                
+                })
+                .catch((error) => {
+                    alert("ERROR al ingresar el Proveedor");
+                });
+        },
+
         producto: function() {
             this.$router.push({name: "producto"})
         },
@@ -107,11 +178,9 @@ export default {
         },
         listaprov: function() {
             this.$router.push({name: "listaprov"})
-        },
-    }
-
-
-};
+        },        
+    },
+}
 
 </script>
 

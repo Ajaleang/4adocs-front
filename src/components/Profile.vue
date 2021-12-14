@@ -3,8 +3,8 @@
         <img alt="Logoapp" src="../assets/logohor.png" class="img-fluid" width="250" height="250">
     </div>
     
-    <div class="welcome" >       
-        <h1> Bienvenido <span> {{  }} </span> </h1>
+    <div class="welcome">       
+        <h1> ¡Bienvenido <span> {{ username }} </span> ! </h1>
     </div>
 
     <div class="bloque">
@@ -38,38 +38,16 @@
 
 <script>
 
-import gql from "graphql-tag";
-import jwt_decode from "jwt-decode";
-
 export default {
     name: "profile",
     
     data: function() {
-        return {
-            id              : jwt_decode(localStorage.getItem("token_refresh")).user_id,
-            userDetailById  : {
-                username    : "",                
+        return {            
+            username: localStorage.getItem("username") || "none",              
             }
-        }
+        
     },
-
-    apollo: {
-        userDetailById: {
-            query: gql  
-                `query ($id: Int!) {
-                    userDetailById(id: $id) {
-                        username                       
-                    }
-                }
-            `,
-            variables() {
-                return {
-                    id: this.id,
-                };
-            },
-        }
-    },
-
+    
     methods: {
         producto: function() {
             this.$router.push({name: "producto"})
@@ -84,7 +62,6 @@ export default {
             this.$router.push({name: "pedidos"})
         },
     },
-
 
 };
 

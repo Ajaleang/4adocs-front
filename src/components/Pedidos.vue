@@ -7,12 +7,12 @@
                    
     <div class="container_pedidos_form">        
             
-        <form >
+        <form v-on:submit.prevent="createPedidos">
          
             <div class="row mb-3">                
                 <div class="col">
                     <div class="form-outline">
-                        <input type="text" id="inventario" class="form-control" placeholder="Id Inventario" />                            
+                        <input type="text" v-model="pedidos.id" id="inventario" class="form-control" placeholder="Id Inventario" />                            
                     </div>
                 </div>
                 
@@ -20,27 +20,30 @@
                     <p>Fecha Solicitud</p>                              
                 </div>
                 <div class="col">                    
-                    <input  type="date" id="start" name="trip-start"
-                            value="2021-12-09"
+                    <input  v-model="pedidos.fecha" type="date" id="start" name="trip-start"
                             min="2000-12-01" max="2030-12-31">         
                 </div>
                 
             </div>         
          
             <div class="form-outline mb-3">
-                <input type="text" id="producto" class="form-control" placeholder="Producto"/>                   
+                <input type="text" v-model="pedidos.productoDestino" id="producto" class="form-control" placeholder="Producto"/>                   
             </div>
     
             <div class="form-outline mb-3">
-                <input type="text" id="proveedor" class="form-control" placeholder="Proveedor"/>                   
+                <input type="text" v-model="pedidos.proveedorOrigen" id="proveedor" class="form-control" placeholder="Proveedor"/>                   
             </div>
 
             <div class="form-outline mb-3">
-                <input type="text" id="costo" class="form-control" placeholder="Precio Costo"/>                   
+                <input type="number" v-model="pedidos.cantidad" id="cantidad" class="form-control" placeholder="Cantidad"/>                   
+            </div>
+
+            <div class="form-outline mb-3">
+                <input type="number" v-model="pedidos.precio" id="costo" class="form-control" placeholder="Precio Costo"/>                   
             </div>                
 
             <button type="submit "><h4>Agregar</h4></button>  
-            <button type="submit "><h4>Buscar</h4></button>                              
+            <button><h4>Buscar</h4></button>                              
            
         </form>
         </div>
@@ -77,11 +80,86 @@
 </template>
 
 <script>
+import gql from "graphql-tag";
+
 export default {
-    name: "pedidos",    
-       
+    name: "pedidos", 
+
+    data: function() {
+        return {
+            pedidos: {
+                id:"",
+                fecha: "",
+                productoDestino:"",
+                proveedorOrigen: "",
+                cantidad: "",
+                precio: "",
+        },
+    };
+},
 
     methods: {
+        createPedidos: async function() {
+
+            if (localStorage.getItem("token_access") === null || localStorage.getItem("token_refresh") === null ) {
+                this.$emit("logOut");
+                return;
+            }
+
+            localStorage.setItem("token_access", "");
+
+            await this.$apollo
+                .mutate ({
+                    mutation: gql
+                         `mutation ($refresh: String!) {
+                            refreshToken(refresh: $refresh) {
+                                access
+                            }
+                        }
+                    `, 
+                variables: {
+                    refresh: localStorage.getItem("token_refresh"),
+                    },
+                })        
+            
+                .then((result) => {
+                    localStorage.setItem("token_access", result.data.refreshToken.access);
+                })
+            
+                .catch((error) => {
+                    this.$emit("logOut");
+                    return;
+                });
+
+            await this.$apollo
+               .mutate({
+                    mutation: gql
+                         `mutation Mutation($pedido: PedidoInput!) {
+                            createPedido(pedido: $pedido) {
+                                id
+                                fecha
+                                productoDestino
+                                proveedorOrigen
+                                cantidad
+                                precio
+                            }
+                        }
+                    `, 
+                    variables: {
+                        pedido: this.pedidos,
+                    },
+                })
+                
+                .then((result) => {
+                    alert ("Pedido Ingresado Exitosamente");
+                
+                })
+                .catch((error) => {
+                    alert("ERROR al ingresar el Pedido");
+                });
+        },   
+       
+
         producto: function() {
             this.$router.push({name: "producto"})
         },
@@ -95,8 +173,6 @@ export default {
             this.$router.push({name: "pedidos"})
         },
     }
-
-
 };
 
 </script>
