@@ -111,6 +111,8 @@
             </button>
         </div>
     </div>
+
+   
 </template>
 
 <script>
@@ -135,6 +137,9 @@ export default {
             },
         };
     },
+
+
+    
 
     methods: {
         createProducts: async function() {
@@ -200,6 +205,8 @@ export default {
                     alert("ERROR al ingresar el Producto");
                 });
         },
+
+
 
         
 
@@ -364,5 +371,7 @@ input {
     background: #fc10e6;
     border: 1px solid #136fb5;
 }
+
+
 
 </style>

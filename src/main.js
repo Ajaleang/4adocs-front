@@ -14,7 +14,7 @@ import "bootstrap"
 
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:4000/farmatic',
+    uri: 'https://api-gateway-farmatic.herokuapp.com/',
 })
 
 const authLink = setContext((_, { headers }) => {

@@ -88,7 +88,7 @@ const router = createRouter({
 })
 
 const apolloClient = new ApolloClient({
-  link: createHttpLink({ uri: 'http://localhost:4000/farmatic' }),
+  link: createHttpLink({ uri: 'https://api-gateway-farmatic.herokuapp.com/' }),
   cache: new InMemoryCache()
 })
 

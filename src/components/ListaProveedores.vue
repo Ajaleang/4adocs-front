@@ -66,7 +66,6 @@
 </template>
 
 <script>
-
 import gql        from 'graphql-tag';
 
 export default {
@@ -76,8 +75,7 @@ export default {
         return {
             ProveedorListByLaboratorio: [],
         };
-    },
-    
+    },    
     apollo: {
        ProveedorListByLaboratorio: {
             query: gql
@@ -92,10 +90,9 @@ export default {
             `, 
         variables() {
             return {
-                laboratorio: this.ProveedorListByLaboratorio, 
+                laboratorio: this.laboratorio, 
             };
         }
-
         }
     },
    

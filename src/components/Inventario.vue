@@ -7,13 +7,13 @@
          <h1> Inventario </h1>
     </div>
    
-    <div class="input-group" >
+    <div class="input-group" >        
+     
         <div class="form-outline" >
-            <input type="search" id="form1" class="form-control" placeholder="Buscar" />            
+            <input type="search" v-model="nombreMedicamento" id="form1" class="form-control" placeholder="Buscar" />    
         </div>
-        <button type="button" class="btn btn-primary">
-            <fa icon="search"/>
-        </button>
+        <button type="submit" class="btn btn-primary"> <fa icon="search"/> </button> 
+        
     </div>
 
     <div class="bloque_inventario">
@@ -52,7 +52,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="inventario in  inventarioByMedicamento" :key="inventario.nombreMedicamento">
+            <tr v-for="inventario in inventarioByMedicamento" :key="inventario.id">
                 <td> {{ inventario.id }} </td>
                 <td> {{ inventario.laboratorio }} </td> 
                 <td> {{ inventario.nombreMedicamento }} </td>
@@ -75,24 +75,22 @@ export default {
     name: "inventario",    
    
     data: function() {
-            return {
-                inventarioByMedicamento: {
-                    id:"",
+             return {              
+                inventarioByMedicamento: [{
+                    id: "",
                     laboratorio: "",
                     nombreMedicamento: "",
-                    concentracion:"",                    
+                    concentracion: "",
                     cantidad: "",
-                    
-            },
+                }]
+            
         };
     },
-
-
     apollo: {
         inventarioByMedicamento: {
             query: gql
                 `query Query($nombreMedicamento: String!) {
-                    inventarioByMedicamento(nombreMedicamento: $nombreMedicamento){
+                    inventarioByMedicamento(nombreMedicamento: $nombreMedicamento) {
                         id
                         laboratorio
                         nombreMedicamento
@@ -103,7 +101,7 @@ export default {
             `, 
         variables() {
             return {
-                nombreMedicamento: this.inventarioByMedicamento, 
+                nombreMedicamento: this.nombreMedicamento, 
             };
         }
 
@@ -114,7 +112,8 @@ export default {
         this.$apollo.queries.inventarioByMedicamento.refetch();
     },
     
-    methods: {
+    methods: {      
+
         producto: function() {
             this.$router.push({name: "producto"})
         },
@@ -145,7 +144,10 @@ export default {
 .input-group {
     margin-left: 435px;
     margin-top: 30px;
-    
+}
+
+.input-group button{
+    display: inline-block;
 }
 
 .inventario {
@@ -204,7 +206,7 @@ export default {
 
 .table_inv {      
     margin-top: 30px;
-    margin-left: 300px; 
+    margin-left: 250px; 
     white-space:nowrap;     
     display: inline-block; 
     position: relative;

@@ -80,8 +80,10 @@ export default {
             localStorage.clear();
             alert("Sesión Cerrada");
             this.loadLogIn();
-        },   
+        },  
         
+        
+    
     },
 
    
